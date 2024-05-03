@@ -2,7 +2,10 @@ import {useMemo} from 'react';
 import {useLoaderData} from '@remix-run/react';
 import {json} from '@shopify/remix-oxygen';
 import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {AnalyticsPageType, getPaginationVariables} from '@shopify/hydrogen';
+import {
+  getPaginationVariables,
+  UNSTABLE_Analytics as Analytics,
+} from '@shopify/hydrogen';
 import {RenderSections} from '@pack/react';
 import type {ProductCollectionSortKeys} from '@shopify/hydrogen/storefront-api-types';
 
@@ -67,11 +70,6 @@ export async function loader({params, context, request}: LoaderFunctionArgs) {
   if (!collection) throw new Response(null, {status: 404});
 
   const shop = await getShop(context);
-  const analytics = {
-    pageType: AnalyticsPageType.collection,
-    collectionHandle: handle,
-    resourceId: collection.id,
-  };
   const seo = seoPayload.collection({
     collection,
     page: collectionPage,
@@ -82,7 +80,6 @@ export async function loader({params, context, request}: LoaderFunctionArgs) {
 
   return json({
     activeFilterValues,
-    analytics,
     collection,
     collectionPage,
     seo,
@@ -104,17 +101,27 @@ export default function CollectionRoute() {
   }, [collectionPage]);
 
   return (
-    <div data-comp={CollectionRoute.displayName}>
-      {collectionPage && <RenderSections content={collectionPage} />}
+    <>
+      <div data-comp={CollectionRoute.displayName}>
+        {collectionPage && <RenderSections content={collectionPage} />}
 
-      <section data-comp="collection">
-        <Collection
-          activeFilterValues={activeFilterValues as ActiveFilterValue[]}
-          collection={collection}
-          showHeading={!hasVisibleHeroSection}
-        />
-      </section>
-    </div>
+        <section data-comp="collection">
+          <Collection
+            activeFilterValues={activeFilterValues as ActiveFilterValue[]}
+            collection={collection}
+            showHeading={!hasVisibleHeroSection}
+          />
+        </section>
+      </div>
+      <Analytics.CollectionView
+        data={{
+          collection: {
+            id: collection.id,
+            handle: collection.handle,
+          },
+        }}
+      />
+    </>
   );
 }
 

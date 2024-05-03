@@ -1,4 +1,4 @@
-import {Script} from '@shopify/hydrogen';
+import {Script, useNonce} from '@shopify/hydrogen';
 
 import {useLocale, useRootLoaderData} from '~/hooks';
 
@@ -25,6 +25,7 @@ const DEBUG = true;
 
 export function DataLayer() {
   const {ENV} = useRootLoaderData();
+  const nonce = useNonce();
   const {currency: currencyCode} = useLocale();
   const {handleDataLayerEvent} = useDataLayerEvent({DEBUG, ENV});
 
@@ -82,6 +83,7 @@ export function DataLayer() {
   if (ENV?.PUBLIC_ELEVAR_SIGNING_KEY) {
     return (
       <Script
+        nonce={nonce}
         type="module"
         id="elevar-script"
         dangerouslySetInnerHTML={{
@@ -106,6 +108,7 @@ export function DataLayer() {
     return (
       <>
         <Script
+          nonce={nonce}
           id="gtag-script"
           type="text/javascript"
           async
@@ -113,6 +116,7 @@ export function DataLayer() {
         />
 
         <Script
+          nonce={nonce}
           id="gtag-config"
           type="text/javascript"
           dangerouslySetInnerHTML={{

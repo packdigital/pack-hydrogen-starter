@@ -9,6 +9,7 @@ export * from './Cart';
 export * from './Collection';
 export * from './Container';
 export * from './CountrySelector';
+export * from './CustomAnalytics';
 export * from './DataLayer';
 export * from './Document';
 export * from './Drawer';

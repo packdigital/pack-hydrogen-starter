@@ -2,8 +2,7 @@ import {useLoaderData} from '@remix-run/react';
 import {ProductProvider} from '@shopify/hydrogen-react';
 import {json} from '@shopify/remix-oxygen';
 import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {AnalyticsPageType} from '@shopify/hydrogen';
-import type {ShopifyAnalyticsProduct} from '@shopify/hydrogen';
+import {UNSTABLE_Analytics as Analytics} from '@shopify/hydrogen';
 import {RenderSections} from '@pack/react';
 
 import {
@@ -151,20 +150,6 @@ export async function loader({params, context, request}: LoaderFunctionArgs) {
 
   delete product.selectedVariant;
 
-  const productAnalytics: ShopifyAnalyticsProduct = {
-    productGid: product.id,
-    variantGid: selectedVariant.id,
-    name: product.title,
-    variantName: selectedVariant.title,
-    brand: product.vendor,
-    price: selectedVariant.price.amount,
-  };
-  const analytics = {
-    pageType: AnalyticsPageType.product,
-    resourceId: product.id,
-    products: [productAnalytics],
-    totalValue: parseFloat(selectedVariant.price.amount),
-  };
   const shop = await getShop(context);
   const siteSettings = await getSiteSettings(context);
   const seo = seoPayload.product({
@@ -177,7 +162,6 @@ export async function loader({params, context, request}: LoaderFunctionArgs) {
   });
 
   return json({
-    analytics,
     product,
     productPage,
     selectedVariant,
@@ -191,16 +175,34 @@ export default function ProductRoute() {
     useLoaderData<typeof loader>();
 
   return (
-    <ProductProvider
-      data={product}
-      initialVariantId={selectedVariant?.id || null}
-    >
-      <div data-comp={ProductRoute.displayName}>
-        <Product product={product} />
+    <>
+      <ProductProvider
+        data={product}
+        initialVariantId={selectedVariant?.id || null}
+      >
+        <div data-comp={ProductRoute.displayName}>
+          <Product product={product} />
 
-        {productPage && <RenderSections content={productPage} />}
-      </div>
-    </ProductProvider>
+          {productPage && <RenderSections content={productPage} />}
+        </div>
+      </ProductProvider>
+
+      <Analytics.ProductView
+        data={{
+          products: [
+            {
+              id: product.id,
+              title: product.title,
+              price: product.selectedVariant?.price.amount || '0',
+              vendor: product.vendor,
+              variantId: product.selectedVariant?.id || '',
+              variantTitle: product.selectedVariant?.title || '',
+              quantity: 1,
+            },
+          ],
+        }}
+      />
+    </>
   );
 }
 

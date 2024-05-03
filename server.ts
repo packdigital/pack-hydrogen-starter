@@ -15,7 +15,6 @@ import {createPackClient, PreviewSession} from '@pack/hydrogen';
 
 import {AppSession} from '~/lib/session.server';
 import {getLocaleFromRequest} from '~/lib/utils';
-
 import defaultThemeData from '~/config/default-theme-data.json';
 
 /**

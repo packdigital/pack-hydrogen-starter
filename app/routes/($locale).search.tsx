@@ -4,7 +4,10 @@ import type {
   LoaderFunctionArgs,
 } from '@shopify/remix-oxygen';
 import {useLoaderData} from '@remix-run/react';
-import {AnalyticsPageType, getPaginationVariables} from '@shopify/hydrogen';
+import {
+  getPaginationVariables,
+  UNSTABLE_Analytics as Analytics,
+} from '@shopify/hydrogen';
 import type {
   Collection as CollectionType,
   SearchSortKeys,
@@ -128,7 +131,6 @@ export async function loader({request, context}: LoaderFunctionArgs) {
   } as CollectionType;
 
   const shop = await getShop(context);
-  const analytics = {pageType: AnalyticsPageType.search};
   const seo = seoPayload.collection({
     collection,
     page: {} as Page,
@@ -139,7 +141,6 @@ export async function loader({request, context}: LoaderFunctionArgs) {
 
   return json({
     activeFilterValues,
-    analytics,
     collection,
     searchTerm,
     seo,
@@ -151,14 +152,19 @@ export default function SearchRoute() {
     useLoaderData<typeof loader>();
 
   return (
-    <section data-comp="search-page" className="[&_h1]:text-title-h3">
-      <Collection
-        activeFilterValues={activeFilterValues as ActiveFilterValue[]}
-        collection={collection}
-        searchTerm={searchTerm}
-        showHeading
+    <>
+      <section data-comp="search-page" className="[&_h1]:text-title-h3">
+        <Collection
+          activeFilterValues={activeFilterValues as ActiveFilterValue[]}
+          collection={collection}
+          searchTerm={searchTerm}
+          showHeading
+        />
+      </section>
+      <Analytics.SearchView
+        data={{searchTerm, searchResults: collection.products}}
       />
-    </section>
+    </>
   );
 }
 

@@ -1,4 +1,4 @@
-import {Script} from '@shopify/hydrogen';
+import {Script, useNonce} from '@shopify/hydrogen';
 
 import {useLoadScript, useRootLoaderData} from '~/hooks';
 
@@ -12,6 +12,7 @@ import {useLoadScript, useRootLoaderData} from '~/hooks';
 
 export function Scripts() {
   const {ENV} = useRootLoaderData();
+  const nonce = useNonce();
 
   useLoadScript(
     {
@@ -43,6 +44,7 @@ export function Scripts() {
       dangerouslySetInnerHTML={{
         __html: `window.ENV = ${JSON.stringify(ENV)}`,
       }}
+      nonce={nonce}
     />
   );
 }

@@ -7,7 +7,11 @@ import {
 import type {ShouldRevalidateFunction} from '@remix-run/react';
 import {defer} from '@shopify/remix-oxygen';
 import type {LinksFunction, LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {ShopifySalesChannel} from '@shopify/hydrogen';
+import {
+  ShopifySalesChannel,
+  UNSTABLE_Analytics as Analytics,
+  getShopAnalytics,
+} from '@shopify/hydrogen';
 
 import {ApplicationError, Document, NotFound, ServerError} from '~/components';
 import {customerGetAction, validateCustomerAccessToken} from '~/lib/customer';
@@ -73,7 +77,7 @@ export const links: LinksFunction = () => {
 };
 
 export async function loader({context, request}: LoaderFunctionArgs) {
-  const {storefront, session, pack} = context;
+  const {storefront, session, pack, env, cart} = context;
   const isPreviewModeEnabled = pack.isPreviewModeEnabled();
 
   const shop = await getShop(context);
@@ -120,6 +124,15 @@ export async function loader({context, request}: LoaderFunctionArgs) {
       siteSettings,
       siteTitle: SITE_TITLE,
       url: request.url,
+      shop: getShopAnalytics({
+        storefront,
+        publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
+      }),
+
+      consent: {
+        checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
+        storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
+      },
     },
     {headers},
   );

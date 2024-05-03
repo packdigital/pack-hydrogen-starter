@@ -1,6 +1,9 @@
 import {json} from '@shopify/remix-oxygen';
 import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {AnalyticsPageType} from '@shopify/hydrogen';
+import {
+  AnalyticsPageType,
+  UNSTABLE_Analytics as Analytics,
+} from '@shopify/hydrogen';
 
 import {CartPage} from '~/components';
 import {getShop, getSiteSettings} from '~/lib/utils';
@@ -20,7 +23,11 @@ export async function loader({context}: LoaderFunctionArgs) {
 }
 
 export default function CartRoute() {
-  return <CartPage />;
+  return (
+    <>
+      <CartPage /> <Analytics.CartView />
+    </>
+  );
 }
 
 CartRoute.displayName = 'CartRoute';
