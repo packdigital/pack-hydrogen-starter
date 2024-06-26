@@ -100,7 +100,7 @@ export function useProductOptionValue({
   const isColor = name === COLOR_OPTION_NAME;
   const isDisabled = !selectedVariantFromOptions;
   const isFromGrouping = Boolean(
-    selectedVariantFromOptions?.product?.id !== product.id,
+    selectedVariantFromOptions?.product?.handle !== product.handle,
   );
   const isSelected = Boolean(selectedOptionsMap?.[name] === value);
 
